@@ -25,8 +25,7 @@ jobs:
       - name: Check for Bazel build file changes
         id: bazel_check
         run: |
-          set -o pipefail
-          ./ci/check_bazel.sh //examples/android:android_app || true
+          ./ci/check_bazel.sh //examples/android:android_app
           echo "BAZEL_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
@@ -34,8 +33,7 @@ jobs:
       - name: Check for workflow file changes
         id: workflow_check
         run: |
-          set -o pipefail
-          ./ci/files_changed.sh .github/workflows/android.yaml || true
+          ./ci/files_changed.sh .github/workflows/android.yaml
           echo "WORKFLOW_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
@@ -43,8 +41,7 @@ jobs:
       - name: Check for relevant Gradle changes
         id: gradle_check
         run: |
-          set -o pipefail
-          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$" || true
+          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$"
           echo "GRADLE_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
