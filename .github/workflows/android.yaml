@@ -25,21 +25,27 @@ jobs:
       - name: Check for Bazel build file changes
         id: bazel_check
         run: |
-          ./ci/check_bazel.sh //examples/android:android_app || echo "BAZEL_CHECK_STATUS=$?" >> $GITHUB_ENV
+          set -o pipefail
+          ./ci/check_bazel.sh //examples/android:android_app || true
+          echo "BAZEL_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
       # Check for workflow file changes
       - name: Check for workflow file changes
         id: workflow_check
         run: |
-          ./ci/files_changed.sh .github/workflows/android.yaml || echo "WORKFLOW_CHECK_STATUS=$?" >> $GITHUB_ENV
+          set -o pipefail
+          ./ci/files_changed.sh .github/workflows/android.yaml || true
+          echo "WORKFLOW_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
       # Check for relevant Gradle changes
       - name: Check for relevant Gradle changes
         id: gradle_check
         run: |
-          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$" || echo "GRADLE_CHECK_STATUS=$?" >> $GITHUB_ENV
+          set -o pipefail
+          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$" || true
+          echo "GRADLE_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
       # Determine if tests should run based on change detection
