@@ -8,21 +8,22 @@ echo "DEBUG: GITHUB_BASE_REF: $GITHUB_BASE_REF"
 echo "DEBUG: GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
 echo "DEBUG: Remote repositories: $(git remote -v)"
 
-# Compares $GITHUB_HEAD_REF and $GITHUB_BASE_REF (PR branch + target branch, usually main) to
-# determine which Bazel targets have changed. This is done by analysizing the cache keys and
-# should be authoritive assuming the builds are hermietic.
-#
-# Usage ./ci/check_bazel.sh <list of targets to check for in the changeset>
+# Get the latest commit SHA for the base branch (target branch of the PR)
+base_sha=$(git rev-parse "$GITHUB_BASE_REF")
+# Get the latest commit SHA for the PR branch (the head ref in the forked repository)
+final_revision=$GITHUB_SHA
+
+# Use git merge-base to find the common ancestor of the two commits
+previous_revision=$(git merge-base "$base_sha" "$final_revision")
+
+echo "DEBUG: Base SHA: $base_sha"
+echo "DEBUG: Final Revision (Head SHA): $final_revision"
+echo "DEBUG: Previous Revision (Merge Base): $previous_revision"
 
 # Path to your Bazel WORKSPACE directory
 workspace_path=$(pwd)
 # Path to your Bazel executable
 bazel_path=$(pwd)/bazelw
-# Starting Revision SHA. We use the merge-base to better handle the case where HEAD is not ahead of main.
-base_sha=$(git rev-parse "origin/$GITHUB_BASE_REF")
-previous_revision=$(git merge-base "$base_sha" "origin/$GITHUB_HEAD_REF")
-# Final Revision SHA
-final_revision=$GITHUB_HEAD_REF
 
 starting_hashes_json="/tmp/starting_hashes.json"
 final_hashes_json="/tmp/final_hashes.json"
