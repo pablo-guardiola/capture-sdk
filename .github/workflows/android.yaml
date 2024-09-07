@@ -25,7 +25,7 @@ jobs:
       - name: Check for Bazel build file changes
         id: bazel_check
         run: |
-          ./ci/check_bazel.sh //examples/android:android_app
+          ./ci/check_bazel.sh //examples/android:android_app || true
           echo "BAZEL_CHECK_STATUS=${{ env.check_result }}" >> $GITHUB_ENV
         continue-on-error: true
 
@@ -33,7 +33,7 @@ jobs:
       - name: Check for workflow file changes
         id: workflow_check
         run: |
-          ./ci/files_changed.sh .github/workflows/android.yaml
+          ./ci/files_changed.sh .github/workflows/android.yaml || true
           echo "WORKFLOW_CHECK_STATUS=${{ env.check_result }}" >> $GITHUB_ENV
         continue-on-error: true
 
@@ -41,7 +41,7 @@ jobs:
       - name: Check for relevant Gradle changes
         id: gradle_check
         run: |
-          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$"
+          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$" || true
           echo "GRADLE_CHECK_STATUS=${{ env.check_result }}" >> $GITHUB_ENV
         continue-on-error: true
 
