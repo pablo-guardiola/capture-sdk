@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Trap to handle unexpected errors and log them
-trap 'echo "An unexpected error occurred during Bazel check."; exit 1' ERR
+trap 'echo "An unexpected error occurred during Bazel check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
 echo "DEBUG: Starting check_bazel.sh"
 echo "DEBUG: Current directory: $(pwd)"
@@ -79,8 +79,10 @@ done
 
 # Exit code based on whether changes were detected
 if [ "$changes_detected" = true ]; then
+  echo "check_result=0" >> "$GITHUB_OUTPUT";
   exit 0  # Changes found
 else
   echo "No changes detected."
+  echo "check_result=2" >> "$GITHUB_OUTPUT";
   exit 2  # No changes found (but no error)
 fi
