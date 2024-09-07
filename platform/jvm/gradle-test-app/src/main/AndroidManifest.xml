@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--  This is a test to see if the pre_check workflow works  -->
     <application
         android:name=".GradleTestApp"
         android:allowBackup="true"
