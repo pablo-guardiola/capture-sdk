@@ -25,33 +25,30 @@ jobs:
       - name: Check for Bazel build file changes
         id: bazel_check
         run: |
-          ./ci/check_bazel.sh //examples/android:android_app || true
-          echo "BAZEL_CHECK_STATUS=${{ env.check_result }}" >> $GITHUB_ENV
+          ./ci/check_bazel.sh //examples/android:android_app
         continue-on-error: true
 
       # Check for workflow file changes
       - name: Check for workflow file changes
         id: workflow_check
         run: |
-          ./ci/files_changed.sh .github/workflows/android.yaml || true
-          echo "WORKFLOW_CHECK_STATUS=${{ env.check_result }}" >> $GITHUB_ENV
+          ./ci/files_changed.sh .github/workflows/android.yaml
         continue-on-error: true
 
       # Check for relevant Gradle changes
       - name: Check for relevant Gradle changes
         id: gradle_check
         run: |
-          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$" || true
-          echo "GRADLE_CHECK_STATUS=${{ env.check_result }}" >> $GITHUB_ENV
+          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$"
         continue-on-error: true
 
       # Determine if tests should run based on change detection
       - name: Determine if tests should run
         id: check_changes_separate
         run: |
-          bazel_status="${{ env.BAZEL_CHECK_STATUS }}"
-          workflow_status="${{ env.WORKFLOW_CHECK_STATUS }}"
-          gradle_status="${{ env.GRADLE_CHECK_STATUS }}"
+          bazel_status="${{ steps.bazel_check.outputs.check_result }}"
+          workflow_status="${{ steps.workflow_check.outputs.check_result }}"
+          gradle_status="${{ steps.gradle_check.outputs.check_result }}"
 
           # Check if any status indicates a relevant change or error
           if [[ "$bazel_status" == "0" || "$workflow_status" == "0" || "$gradle_status" == "0" ]]; then
