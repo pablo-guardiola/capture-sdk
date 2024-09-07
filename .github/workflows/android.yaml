@@ -21,48 +21,53 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Check for Bazel build file changes
       - name: Check for Bazel build file changes
         id: bazel_check
-        run: ./ci/check_bazel.sh //examples/android:android_app
+        run: |
+          ./ci/check_bazel.sh //examples/android:android_app || echo "BAZEL_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
+      # Check for workflow file changes
       - name: Check for workflow file changes
         id: workflow_check
-        run: ./ci/files_changed.sh .github/workflows/android.yaml
+        run: |
+          ./ci/files_changed.sh .github/workflows/android.yaml || echo "WORKFLOW_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
+      # Check for relevant Gradle changes
       - name: Check for relevant Gradle changes
         id: gradle_check
-        run: ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$"
+        run: |
+          ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$" || echo "GRADLE_CHECK_STATUS=$?" >> $GITHUB_ENV
         continue-on-error: true
 
+      # Determine if tests should run based on change detection
       - name: Determine if tests should run
         id: check_changes_separate
         run: |
-          if [[ "${{ steps.bazel_check.outcome }}" == "success" ]]; then
-            echo "Bazel check passed!"
-          else
-            echo "Bazel check failed!"
-          fi
+          bazel_status="${{ env.BAZEL_CHECK_STATUS }}"
+          workflow_status="${{ env.WORKFLOW_CHECK_STATUS }}"
+          gradle_status="${{ env.GRADLE_CHECK_STATUS }}"
 
-          if [[ "${{ steps.workflow_check.outcome }}" == "success" ]]; then
-            echo "Workflow check passed!"
+          # Check if any status indicates a relevant change or error
+          if [[ "$bazel_status" == "0" || "$workflow_status" == "0" || "$gradle_status" == "0" ]]; then
+            echo "Changes detected in one or more checks. Running tests."
+            echo "run_tests=true" >> $GITHUB_ENV
+          elif [[ "$bazel_status" == "2" && "$workflow_status" == "2" && "$gradle_status" == "2" ]]; then
+            echo "No relevant changes found."
+            echo "run_tests=false" >> $GITHUB_ENV
           else
-            echo "Workflow check failed!"
-          fi
-
-          if [[ "${{ steps.gradle_check.outcome }}" == "success" ]]; then
-            echo "Gradle check passed!"
-          else
-            echo "Gradle check failed!"
+            echo "An unexpected issue occurred during checks."
+            exit 1
           fi
         shell: bash
 
-      - name: check for relevant changes
+      # Run downstream scripts based on changes detected
+      - name: Run downstream tests if changes are detected
         id: check_changes
-        run: |
-          ./ci/run_tests.sh
-
+        if: env.run_tests == 'true'
+        run: ./ci/run_tests.sh
 
   build_apk:
     runs-on: ubuntu-latest

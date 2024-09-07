@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Trap to handle unexpected errors and log them
+trap 'echo "An unexpected error occurred during Bazel check."; exit 1' ERR
+
 echo "DEBUG: Starting check_bazel.sh"
 echo "DEBUG: Current directory: $(pwd)"
 echo "DEBUG: GITHUB_BASE_REF: $GITHUB_BASE_REF"
@@ -9,7 +12,7 @@ echo "DEBUG: GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
 echo "DEBUG: Remote repositories: $(git remote -v)"
 
 # Ensure we fetch the base branch (main) to make it available
-git fetch origin "$GITHUB_BASE_REF"
+git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
 
 # Get the latest commit SHA for the base branch (target branch of the PR)
 base_sha=$(git rev-parse "$GITHUB_BASE_REF")
@@ -63,14 +66,21 @@ pattern_impacted() {
   grep -q "$1" /tmp/impacted_targets.txt
 }
 
+changes_detected=false
+
 for pattern in "$@"
 do
   if pattern_impacted "$pattern"; then
     echo "$pattern changed!"
-    exit 0
+    changes_detected=true
+    break
   fi
 done
 
-# No relevant changes detected via Bazel.
-echo "Nothing changed"
-exit 1
+# Exit code based on whether changes were detected
+if [ "$changes_detected" = true ]; then
+  exit 0  # Changes found
+else
+  echo "No changes detected."
+  exit 2  # No changes found (but no error)
+fi
