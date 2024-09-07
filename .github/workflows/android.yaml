@@ -21,16 +21,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Check for Bazel build file changes
       - name: Check for Bazel build file changes
         id: bazel_check
         run: ./ci/check_bazel.sh //examples/android:android_app
         continue-on-error: true
 
+      # Check for workflow file changes
       - name: Check for workflow file changes
         id: workflow_check
         run: ./ci/files_changed.sh .github/workflows/android.yaml
         continue-on-error: true
 
+      # Check for relevant Gradle changes
       - name: Check for relevant Gradle changes
         id: gradle_check
         run: ./ci/files_changed.sh "^platform/jvm/gradle-test-app/.*\.(gradle|kts|kt|xml)$"
