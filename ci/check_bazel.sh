@@ -8,6 +8,9 @@ echo "DEBUG: GITHUB_BASE_REF: $GITHUB_BASE_REF"
 echo "DEBUG: GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
 echo "DEBUG: Remote repositories: $(git remote -v)"
 
+# Ensure we fetch the base branch (main) to make it available
+git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
+
 # Get the latest commit SHA for the base branch (target branch of the PR)
 base_sha=$(git rev-parse "$GITHUB_BASE_REF")
 # Get the latest commit SHA for the PR branch (the head ref in the forked repository)
