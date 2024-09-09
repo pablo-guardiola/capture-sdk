@@ -10,12 +10,6 @@ set -e
 # Trap to handle unexpected errors and log them
 trap 'echo "An unexpected error occurred during file change check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
-echo "DEBUG: Starting files_changed.sh"
-echo "DEBUG: Current directory: $(pwd)"
-echo "DEBUG: Current branch: $(git rev-parse --abbrev-ref HEAD)"
-echo "DEBUG: GITHUB_BASE_REF: $GITHUB_BASE_REF"
-echo "DEBUG: Remote repositories: $(git remote -v)"
-
 # Check for file changes
 if git rev-parse --abbrev-ref HEAD | grep -q ^main$ || git diff --name-only "origin/$GITHUB_BASE_REF" | grep -E "$1" ; then
   echo "Relevant file changes detected!"

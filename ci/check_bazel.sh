@@ -5,12 +5,6 @@ set -euo pipefail
 # Trap to handle unexpected errors and log them
 trap 'echo "An unexpected error occurred during Bazel check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
-echo "DEBUG: Starting check_bazel.sh"
-echo "DEBUG: Current directory: $(pwd)"
-echo "DEBUG: GITHUB_BASE_REF: $GITHUB_BASE_REF"
-echo "DEBUG: GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
-echo "DEBUG: Remote repositories: $(git remote -v)"
-
 # Ensure we fetch the base branch (main) to make it available
 git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
 
@@ -21,10 +15,6 @@ final_revision=$GITHUB_SHA
 
 # Use git merge-base to find the common ancestor of the two commits
 previous_revision=$(git merge-base "$base_sha" "$final_revision")
-
-echo "DEBUG: Base SHA: $base_sha"
-echo "DEBUG: Final Revision (Head SHA): $final_revision"
-echo "DEBUG: Previous Revision (Merge Base): $previous_revision"
 
 # Path to your Bazel WORKSPACE directory
 workspace_path=$(pwd)
