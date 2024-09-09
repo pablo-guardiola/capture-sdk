@@ -16,6 +16,7 @@ jobs:
       should_run: ${{ steps.check_changes.outputs.run_tests }}
     steps:
       # Checkout repo to Github Actions runner
+      # Empty line for testing - remove before merging
       - name: Checkout
         uses: actions/checkout@v4
         with:
