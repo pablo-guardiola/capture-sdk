@@ -11,11 +11,14 @@ set -euo pipefail
 # Trap to handle unexpected errors and log them
 trap 'echo "An unexpected error occurred during Bazel check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
-# Ensure we fetch the base branch (main) to make it available
-git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
-
-# Get the latest commit SHA for the base branch (target branch of the PR)
-base_sha=$(git rev-parse "$GITHUB_BASE_REF")
+# Fallback to HEAD~1 if GITHUB_BASE_REF is empty (e.g., when running on the main branch).
+if [[ -z "${GITHUB_BASE_REF:-}" ]]; then
+  echo "GITHUB_BASE_REF is empty, likely running on main branch. Using HEAD~1."
+  base_sha=$(git rev-parse HEAD~1)
+else
+  git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
+  base_sha=$(git rev-parse "$GITHUB_BASE_REF")
+fi
 # Get the latest commit SHA for the PR branch (the head ref in the forked repository)
 final_revision=$GITHUB_SHA
 
