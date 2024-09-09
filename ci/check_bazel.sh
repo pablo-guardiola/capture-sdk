@@ -12,32 +12,20 @@ set -euo pipefail
 trap 'echo "An unexpected error occurred during Bazel check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
 # Ensure we fetch the base branch (main) to make it available
-# TODO uncomment
-#git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
+git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
 
 # Get the latest commit SHA for the base branch (target branch of the PR)
-# TODO uncomment
-#base_sha=$(git rev-parse "$GITHUB_BASE_REF")
+base_sha=$(git rev-parse "$GITHUB_BASE_REF")
 # Get the latest commit SHA for the PR branch (the head ref in the forked repository)
-# TODO uncomment
-#final_revision=$GITHUB_SHA
+final_revision=$GITHUB_SHA
 
 # Use git merge-base to find the common ancestor of the two commits
-# TODO uncomment
-#previous_revision=$(git merge-base "$base_sha" "$final_revision")
+previous_revision=$(git merge-base "$base_sha" "$final_revision")
 
 # Path to your Bazel WORKSPACE directory
 workspace_path=$(pwd)
 # Path to your Bazel executable
 bazel_path=$(pwd)/bazelw
-
-# TODO uncomment
-# Starting Revision SHA. We use the merge-base to better handle the case where HEAD is not ahead of main.
-base_sha=$(git rev-parse "origin/$GITHUB_BASE_REF")
-previous_revision=$(git merge-base "$base_sha" "origin/$GITHUB_HEAD_REF")
-# Final Revision SHA
-final_revision=$GITHUB_HEAD_REF
-# TODO end of test error
 
 starting_hashes_json="/tmp/starting_hashes.json"
 final_hashes_json="/tmp/final_hashes.json"
