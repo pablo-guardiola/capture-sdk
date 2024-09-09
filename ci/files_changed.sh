@@ -18,5 +18,4 @@ if git rev-parse --abbrev-ref HEAD | grep -q ^main$ || git diff --name-only "ori
 else
   echo "No relevant changes found."
   echo "check_result=2" >> "$GITHUB_OUTPUT"
-  exit 2  # No relevant changes found (but no error)
 fi
