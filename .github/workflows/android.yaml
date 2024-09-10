@@ -16,10 +16,6 @@ jobs:
       should_run: ${{ steps.check_changes.outputs.run_tests }}
     steps:
       # Checkout repo to Github Actions runner
-      # This is another test
-      # Changing file
-      # One more test
-      # One more test
       - name: Checkout
         uses: actions/checkout@v4
         with:
