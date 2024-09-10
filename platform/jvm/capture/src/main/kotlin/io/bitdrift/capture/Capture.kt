@@ -97,7 +97,7 @@ object Capture {
             }
 
             // This is a test
-            val test = true
+            val test = false
 
             // If the logger has already been configured, do nothing.
             if (default.get() != null) {
