@@ -96,6 +96,9 @@ object Capture {
                 return
             }
 
+            // This is a test
+            val test = true
+
             // If the logger has already been configured, do nothing.
             if (default.get() != null) {
                 Log.w("capture", "Attempted to initialize Capture more than once")
