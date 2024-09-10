@@ -18,7 +18,7 @@ else
   base_ref="origin/$GITHUB_BASE_REF"
 fi
 
-if git rev-parse --abbrev-ref HEAD~1 | grep -q ^main$ ; then
+if git rev-parse --abbrev-ref HEAD | grep -q ^main$ ; then
   echo "Relevant file changes detected!"
   echo "check_result=0" >> "$GITHUB_OUTPUT"
   exit 0
