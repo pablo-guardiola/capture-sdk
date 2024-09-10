@@ -20,8 +20,22 @@ trap 'echo "An unexpected error occurred during file change check."; echo "check
 #  base_ref="origin/$GITHUB_BASE_REF"
 #fi
 
+
+# Check if current branch is main
+is_main_branch=false
+if git rev-parse --abbrev-ref HEAD | grep -q ^main$; then
+  is_main_branch=true
+fi
+
+
+# Check for file changes using the base ref
+changes_detected=false
+if $is_main_branch || git diff --name-only "origin/$GITHUB_BASE_REF" | grep -E "$1"; then
+  changes_detected=true
+fi
+
 # Check for file changes
-if git rev-parse --abbrev-ref HEAD | grep -q ^main$ || git diff --name-only "origin/$GITHUB_BASE_REF" | grep -E "$1" ; then
+if [ "$changes_detected" = true ]; then
   echo "Relevant file changes detected!"
   echo "check_result=0" >> "$GITHUB_OUTPUT"
   exit 0  # Relevant changes detected
