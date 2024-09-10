@@ -27,7 +27,7 @@ if git rev-parse --abbrev-ref HEAD | grep -q ^main$ ; then
 fi
 
 # Run git diff and store output
-diff_output=$(git diff --name-only "origin/$GITHUB_BASE_REF") || exit 1  # Ensure git diff failures are caught
+diff_output=$(git diff --name-only "origin/$GITHUB_BASE_REF" || exit 1)  # Ensure git diff failures are caught
 
 # Check for relevant file changes
 if echo "$diff_output" | grep -E "$1" ; then
