@@ -11,14 +11,12 @@ set -euo pipefail
 trap 'echo "An unexpected error occurred during file change check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
 # Determine the base ref or fallback to HEAD when running on main
-# TODO uncomment this is a test for trap
-#if [[ -z "${GITHUB_BASE_REF:-}" ]]; then
-#  echo "GITHUB_BASE_REF is empty, likely running on main branch. Using HEAD~1 for comparison."
-#  base_ref="HEAD"
-#else
-#  git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
-#  base_ref="origin/$GITHUB_BASE_REF"
-#fi
+if [[ -z "${GITHUB_BASE_REF:-}" ]]; then
+  echo "GITHUB_BASE_REF is empty, likely running on main branch. Using HEAD for comparison."
+  base_ref="HEAD"
+else
+  base_ref="origin/$GITHUB_BASE_REF"
+fi
 
 if git rev-parse --abbrev-ref HEAD | grep -q ^main$ ; then
   echo "Relevant file changes detected!"
@@ -27,7 +25,7 @@ if git rev-parse --abbrev-ref HEAD | grep -q ^main$ ; then
 fi
 
 # Run git diff and store output
-diff_output=$(git diff --name-only "origin/$GITHUB_BASE_REF" || exit 1)  # Ensure git diff failures are caught
+diff_output=$(git diff --name-only "$base_ref" || exit 1)  # Ensure git diff failures are caught
 
 # Check for relevant file changes
 if echo "$diff_output" | grep -E "$1" ; then
