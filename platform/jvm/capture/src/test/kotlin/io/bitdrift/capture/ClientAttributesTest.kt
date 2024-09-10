@@ -32,6 +32,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [21])
 class ClientAttributesTest {
 
+    // This is a test
     @Test
     fun foreground() {
         val context = ApplicationProvider.getApplicationContext<Context>()
