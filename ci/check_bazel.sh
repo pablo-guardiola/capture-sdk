@@ -11,10 +11,10 @@ set -euo pipefail
 # Trap to handle unexpected errors and log them
 trap 'echo "An unexpected error occurred during Bazel check."; echo "check_result=1" >> "$GITHUB_OUTPUT"; exit 1' ERR
 
-# Fallback to HEAD if GITHUB_BASE_REF is empty (e.g., when running on the main branch).
+# Fallback to HEAD~1 if GITHUB_BASE_REF is empty (e.g., when running on the main branch).
 if [[ -z "${GITHUB_BASE_REF:-}" ]]; then
-  echo "GITHUB_BASE_REF is empty, likely running on main branch. Using HEAD."
-  base_sha=$(git rev-parse HEAD)
+  echo "GITHUB_BASE_REF is empty, likely running on main branch. Using HEAD~1."
+  base_sha=$(git rev-parse HEAD~1)
 else
   git fetch origin "$GITHUB_BASE_REF":"$GITHUB_BASE_REF"
   base_sha=$(git rev-parse "$GITHUB_BASE_REF")
